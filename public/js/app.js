@@ -87,11 +87,10 @@ $(function() {
 			};
 			$.ajax(obj).done(function( msg ) {
 				console.log('got msgs',msg)
-				lastTime = (new Date).getTime();
 				msg.forEach(function(item){
 					stream.prepend('<li class="comment"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
-					lastTime = item.ts;
 				})
+				lastTime = (new Date).getTime();
 			});		
 		}
 		currentRefresh = setInterval(pollForPosts, 2000);
