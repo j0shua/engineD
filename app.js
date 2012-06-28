@@ -81,13 +81,13 @@ app.post('/comment/add', function(req, res){
     res.send(404);
   }
   var room_index = roomIndex(room_id);
-  req.body.ts = Number(req.body.ts);
+  req.body.ts = parseInt(req.body.ts);
   rooms[room_index].comments.push(req.body);
   res.send({200: 'ok'});
 });
 
 app.post('/comment/list', function(req, res){
-  var ts = Number(req.body.ts);
+  var ts = parseInt(req.body.ts);
   var room_id = req.body.room_id;
 
   if (!room_id) { 
