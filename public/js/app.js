@@ -90,10 +90,10 @@ $(function() {
 				msg.forEach(function(item){
 					stream.prepend('<li class="comment"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
 				})
-				lastTime = (new Date).getTime();
-			});		
+			});
+			lastTime = (new Date).getTime();
 		}
-		currentRefresh = setInterval(pollForPosts, 2000);
+		currentRefresh = setInterval(pollForPosts, 5000);
 	}
 
 
