@@ -103,7 +103,7 @@ app.post('/comment/list', function(req, res){
   var comments = room.comments;
   if (ts){
     for (var i=0; i<comments.length; i+=1){
-      if (comments[i].ts > ts){
+      if (comments[i].ts >= ts){
         console.log('done on',i)
         break;
       }
