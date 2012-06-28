@@ -81,15 +81,15 @@ app.post('/comment/add', function(req, res){
     res.send(404);
   }
   var room_index = roomIndex(room_id);
+  req.body.ts = Number(req.body.ts);
   rooms[room_index].comments.push(req.body);
   res.send({200: 'ok'});
 });
 
 app.post('/comment/list', function(req, res){
-  var ts = req.body.ts;
+  var ts = Number(req.body.ts);
   var room_id = req.body.room_id;
 
-  console.log('room id', room_id);
   if (!room_id) { 
     res.send(404);
   }
@@ -101,13 +101,12 @@ app.post('/comment/list', function(req, res){
 
   var current;
   var comments = room.comments;
-  if (ts.length){
+  if (ts){
     for (var i=0; i<comments.length; i+=1){
-      current = comments[i];
-      if (current.ts < ts){
-        continue;
+      if (comments[i].ts > ts){
+        console.log('done on',i)
+        break;
       }
-      break;
     }
     comments = comments.slice(i);
   }
