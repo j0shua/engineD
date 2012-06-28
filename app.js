@@ -17,9 +17,9 @@ app.get('/', function(req, res){
   res.send('hi');
 });
 
-app.post('comment/add', function(req, res){
+app.post('/comment/add', function(req, res){
   comments.push(req.body);
-  res.send({200: 'ok');
+  res.send({200: 'ok'});
 });
 
 app.get('/comment/list/:ts?', function(req, res){
