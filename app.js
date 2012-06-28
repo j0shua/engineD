@@ -85,9 +85,11 @@ app.post('/comment/add', function(req, res){
   res.send({200: 'ok'});
 });
 
-app.get('/comment/list/:ts?', function(req, res){
-  var ts = req.params.ts;
+app.post('/comment/list', function(req, res){
+  var ts = req.body.ts;
   var room_id = req.body.room_id;
+
+  console.log('room id', room_id);
   if (!room_id) { 
     res.send(404);
   }
@@ -99,7 +101,7 @@ app.get('/comment/list/:ts?', function(req, res){
 
   var current;
   var comments = room.comments;
-  if (ts){
+  if (ts.length){
     for (var i=0; i<comments.length; i+=1){
       current = comments[i];
       if (current.ts < ts){
