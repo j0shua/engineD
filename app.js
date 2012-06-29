@@ -13,7 +13,7 @@ app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.use(express.bodyParser());
 });
-server.listen(3000);
+server.listen(8000);
 
 // ==section== vars
 var sockets = {};
