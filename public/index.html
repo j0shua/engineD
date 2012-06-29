@@ -8,37 +8,36 @@
 		<script src="js/app.js"></script>
 	</head>
 	<body>
-		<h1>engineD <span></span></h1>
-		<button class="login-button">Login</button>
-		<form class="login">
-			Username: <input class="username" type="text" /><br />
-			Password: <input class="password" type="password" /><br />
-			<input type="submit" value="Login" />
-			<span class="close">X</span>
-			<span class="error"></span>
-		</form>
-		<div class="app-list">
-			<h2>Conversation Topics</h2>
-			<ul>
-			</ul>
-		</div>
-		<div class="app-container">
-			<div class="stream">
-				<h2>Stream <span></span></h2>
-				<a href="" class="backToList">&#8592;Back To List</a>
-				<ul class="comments">
+		<div class="main-container">
+			<h1>engineD <span></span></h1>
+			<button class="login-button btn">Login</button>
+			<form class="login">
+				Username: <input class="username" type="text" /><br />
+				Password: <input class="password" type="password" /><br />
+				<input class="btn" type="submit" value="Login" />
+				<span class="close">X</span>
+				<span class="error"></span>
+			</form>
+			<div class="app-list">
+				<h2>Conversation Topics</h2>
+				<ul>
 				</ul>
-				<form class="post" action="comment/add">
-					Name: <input class="username" type="text" /><br />
-					<textarea></textarea>
-					<input type="submit" value="Post!" />
-				</form>
 			</div>
-			<div class="rail">
-				<h2>Rail</h2>
+			<div class="app-container">
+				<div class="feed gradContainer">
+				</div>
+				<div class="stream">
+					<form class="post gradContainer" action="comment/add">
+						<input class="username" type="text" value="Name" />
+						<textarea></textarea>
+						<input type="submit" value="Post!" class="btn"/>
+					</form>
+					<ul class="comments gradContainer">
+					</ul>
+				</div>
 			</div>
+			<a href="" class="backToList">&#8592;Back To List</a>
 		</div>
-
-    <script src="/socket.io/socket.io.js"></script>
+	    <script src="/socket.io/socket.io.js"></script>
 	</body>
 </html>

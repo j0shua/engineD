@@ -59,6 +59,11 @@ $(function() {
 	loginButton.click(function(){
 		loginForm.show();	
 	})
+	name.click(function() {
+		if (name.val().toLowerCase() === 'name') {
+			name.val('');
+		}
+	})
 
 
 	//form submit handler
