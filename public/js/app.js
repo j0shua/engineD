@@ -1,4 +1,5 @@
 $(function() {
+	var socket = io.connect('http://localhost');
 	var form = $('form'),
 		message = form.find('textarea'),
 		name = form.find('input.username'),
@@ -7,15 +8,11 @@ $(function() {
 		roomUI = $('.app-container'),
 		roomList = listUI.find('ul');
 	
-	var currentRefresh;
 	var currentRoom;
-	var lastTime = null;
 
 	//returns to the room list, clears the stream
 	function backToList() {
-		clearInterval(currentRefresh);
 		currentRoom = null;
-		lastTime = null;
 
 		stream.html('');
 		roomList.html('');
@@ -51,22 +48,15 @@ $(function() {
 
 	//form submit handler
 	form.submit(function() {
-		$.ajax({
-			type: "POST",
-			url: 'comment/add',
-			data: {
-				message: message.val(),
-				name: name.val(),
-				ts: (new Date).getTime(),
-				room_id: currentRoom,
-				img: 'https://si0.twimg.com/profile_images/2326165247/wulxf1wh0at7xo30km0a_reasonably_small.jpeg'
-			}
-		}).done(function( msg ) {
-			alert('Saved!');
-			message.val('');
-			name.val('');
-		});
+		socket.emit('add', {
+			message: message.val(),
+			name: name.val(),
+			room_id: currentRoom,
+			img: 'https://si0.twimg.com/profile_images/2326165247/wulxf1wh0at7xo30km0a_reasonably_small.jpeg'
+		})
 
+		message.val('');
+		name.val('');
 		return false;
 	});
 
@@ -75,31 +65,28 @@ $(function() {
 		currentRoom = room;
 		listUI.hide();
 		roomUI.show();
+		var obj = {
+			type: "POST",
+			url: 'comment/list',
+			data: {
+				room_id: room,
+			}
+		};
+		$.ajax(obj).done(function(room) {
+			room.comments.forEach(renderMsg)
+		});
 
-		function pollForPosts() {
-			var obj = {
-				type: "POST",
-				url: 'comment/list',
-				data: {
-					room_id: room,
-					ts: lastTime || ''
-				}
-			};
-			$.ajax(obj).done(function( msg ) {
-				console.log('got msgs',msg)
-				msg.forEach(function(item){
-					stream.prepend('<li class="comment"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
-				})
-				if (msg.length) {
-					lastTime = msg[msg.length-1].ts;
-				}
-
-				console.log(lastTime);
-			});
-		}
-		currentRefresh = setInterval(pollForPosts, 5000);
+		socket.emit('join', {room_id: currentRoom});
 	}
 
+	//renders a message
+	function renderMsg(item) {
+		stream.prepend('<li class="comment"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
+	}
+
+	socket.on('comment',function(data) {
+		renderMsg(data)
+	})
 
 	//get the list of rooms on page load
 	getRooms();

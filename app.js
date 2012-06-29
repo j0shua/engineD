@@ -52,10 +52,6 @@ function findRoom(id){
   return false;
 }
 
-// ==section== socket.io
-
-// ==section== routing
-
 // list rooms that exist
 // returns an array of room_ids formatted like this:
 // [
@@ -72,31 +68,25 @@ app.get('/room/list', function(req, res){
 });
 
 io.sockets.on('connection', function (socket) {
-  socket.on('message', function (data) {
+  socket.on('join', function (data) {
     socket.join(data.room_id);
+    console.log(socket.id+' joined '+data.room_id);
   });
+
+  socket.on('add',function(data) {
+    addComment(data,socket);
+  })
 });
 
 // todo add check for no room id
 // add a comment to a room
-app.post('/comment/add', function(req, res){
-  var room_id = req.body.room_id;
-  if (!room_id) { 
-    res.send(404);
-  }
-
+function addComment(data,socket){
+  var room_id = data.room_id;
   var room = findRoom(room_id);
-  if (!room){
-    res.send(404);
-  }
-
   var room_index = roomIndex(room_id);
-  req.body.ts = parseInt(req.body.ts);
-  rooms[room_index].comments.push(req.body);
-
-  socket.broadcast.to(room_id).emit(req.body);
-  res.send({200: 'ok'});
-});
+  rooms[room_index].comments.push(data.comment);
+  socket.broadcast.to(room_id).emit('comment', data);
+}
 
 app.post('/comment/list', function(req, res){
   var room_id = req.body.room_id;
