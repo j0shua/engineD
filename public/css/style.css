@@ -59,3 +59,31 @@ a.backToList {
 a.backToList:hover {
 	text-decoration: underline;
 }
+
+form.login {
+	display: none;
+	position: absolute;
+	top: 20px;
+	left: 50%;
+	width: 260px;
+	text-align: center;
+	margin-left: -130px;
+	background: #ccc;
+	padding: 50px;
+	z-index: 10;
+}
+form.login .close {
+	cursor: pointer;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	border: 1px solid;
+}
+.login-button {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+.error {
+	color: red;
+}

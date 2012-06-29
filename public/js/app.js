@@ -1,19 +1,27 @@
 $(function() {
-	var socket = io.connect('http://tcgdev.info');
-	var form = $('form'),
+	var socket = io.connect('http://localhost');
+	var form = $('form.post'),
 		message = form.find('textarea'),
 		name = form.find('input.username'),
 		stream = $('.stream ul'),
 		listUI = $('.app-list'),
 		roomUI = $('.app-container'),
-		roomList = listUI.find('ul');
+		roomList = listUI.find('ul'),
+		roomName = $('h1 span'),
+		loginForm = $('form.login'),
+		loginButton = $('.login-button'),
+		loginError = loginForm.find('span.error');
 	
 	var currentRoom;
+	var user = {
+		username: null,
+		password: null
+	};
 
 	//returns to the room list, clears the stream
 	function backToList() {
+		socket.emit('leave',{room: room_id})
 		currentRoom = null;
-
 		stream.html('');
 		roomList.html('');
 
@@ -45,24 +53,42 @@ $(function() {
 		backToList();
 		return false;
 	})
+	loginForm.on('click','.close',function(){
+		loginForm.hide();
+	})
+	loginButton.click(function(){
+		loginForm.show();	
+	})
+
 
 	//form submit handler
 	form.submit(function() {
-		socket.emit('add', {
+		var data = {
 			message: message.val(),
 			name: name.val(),
 			room_id: currentRoom,
 			img: 'https://si0.twimg.com/profile_images/2326165247/wulxf1wh0at7xo30km0a_reasonably_small.jpeg'
-		})
+		}
+		renderMsg(data);
+		socket.emit('add', data)
 
 		message.val('');
 		name.val('');
 		return false;
 	});
 
+	loginForm.submit(function(){
+		loginError.html('');
+		user.username = loginForm.find('.username').val();
+		user.password = loginForm.find('.password').val();
+		socket.emit('auth',user)
+		return false;
+	})
+
 	//kicks off polling for a specific room, handles the state for the room
 	function initRoom(room) {
 		currentRoom = room;
+		roomName.html(room);
 		listUI.hide();
 		roomUI.show();
 		var obj = {
@@ -73,19 +99,32 @@ $(function() {
 			}
 		};
 		$.ajax(obj).done(function(room) {
+			console.log(room);
 			room.comments.forEach(renderMsg)
 		});
-
 		socket.emit('join', {room_id: currentRoom});
 	}
 
 	//renders a message
 	function renderMsg(item) {
+		if (!item) {return;}
 		stream.prepend('<li class="comment"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
+	}
+
+	function renderAdmin() {
+		alert('You are now an admin');
+		loginForm.hide();
+		loginButton.remove();
 	}
 
 	socket.on('comment',function(data) {
 		renderMsg(data)
+	})
+	socket.on('authsuccess',function(data){
+		renderAdmin();
+	})
+	socket.on('authfail',function(data){
+		loginError.html('Error, please try again.')
 	})
 
 	//get the list of rooms on page load

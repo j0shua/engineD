@@ -8,7 +8,15 @@
 		<script src="js/app.js"></script>
 	</head>
 	<body>
-		<h1>engineD</h1>
+		<h1>engineD <span></span></h1>
+		<button class="login-button">Login</button>
+		<form class="login">
+			Username: <input class="username" type="text" /><br />
+			Password: <input class="password" type="password" /><br />
+			<input type="submit" value="Login" />
+			<span class="close">X</span>
+			<span class="error"></span>
+		</form>
 		<div class="app-list">
 			<h2>Conversation Topics</h2>
 			<ul>
@@ -20,7 +28,7 @@
 				<a href="" class="backToList">&#8592;Back To List</a>
 				<ul class="comments">
 				</ul>
-				<form action="comment/add">
+				<form class="post" action="comment/add">
 					Name: <input class="username" type="text" /><br />
 					<textarea></textarea>
 					<input type="submit" value="Post!" />

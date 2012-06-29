@@ -7,6 +7,9 @@ var app = express();
 var server = http.createServer(app);
 var io = io.listen(server);
 
+var admin = {username: 'a', password: 'a'};
+
+
 // ==section== app configurations
 app.configure('development', function(){
     app.use(express.static(__dirname + '/public'));
@@ -16,7 +19,6 @@ app.configure('development', function(){
 server.listen(8000);
 
 // ==section== vars
-var sockets = {};
 var rooms = [
     {
       id: 'roomOne',
@@ -74,9 +76,41 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('add',function(data) {
+    authenticate({
+      socket: socket,
+      success: function() {
+        console.log("USER SENT A MESSAGE AND IS AUTHED")  
+      }
+    });
     addComment(data,socket);
   })
+
+  socket.on('leave',function(data){
+    socket.leave(data.room_id);
+  })
+
+  socket.on('auth',function(data){
+    if (admin.username === data.username && admin.password === data.password) {
+      socket.set('auth', true, function () {
+        socket.emit('authsuccess');
+      });
+    } else {
+      socket.emit('authfail');
+    }
+  })
 });
+
+function authenticate(data) {
+  if (data.socket) {
+    data.socket.get('auth',function(err,isAuth) {
+      if (isAuth && data.success) {
+        data.success();
+      } else if(data.fail) {
+        data.fail();
+      }
+    })
+  }
+}
 
 // todo add check for no room id
 // add a comment to a room
@@ -84,7 +118,7 @@ function addComment(data,socket){
   var room_id = data.room_id;
   var room = findRoom(room_id);
   var room_index = roomIndex(room_id);
-  rooms[room_index].comments.push(data.comment);
+  rooms[room_index].comments.push(data);
   socket.broadcast.to(room_id).emit('comment', data);
 }
 
