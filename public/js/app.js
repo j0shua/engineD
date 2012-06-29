@@ -1,5 +1,5 @@
 $(function() {
-	var socket = io.connect('http://localhost');
+	var socket = io.connect('http://tcgdev.info');
 	var form = $('form'),
 		message = form.find('textarea'),
 		name = form.find('input.username'),
