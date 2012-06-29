@@ -17,7 +17,7 @@
 		<div class="app-container">
 			<div class="stream">
 				<h2>Stream <span></span></h2>
-				<a href="" class="backToList"><-Back To List</a>
+				<a href="" class="backToList">&#8592;Back To List</a>
 				<ul class="comments">
 				</ul>
 				<form action="comment/add">
@@ -30,6 +30,15 @@
 				<h2>Rail</h2>
 			</div>
 		</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io.connect('http://localhost');
+      socket.on('news', function (data) {
+        console.log('socket:', data);
+        socket.emit('my other event', { my: 'data' });
+      });
+    </script>
 
 	</body>
 </html>

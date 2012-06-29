@@ -1,5 +1,11 @@
+// require libs
 var express = require('express');
-var app = require('express').createServer();
+var http = require('http');
+var io = require('socket.io');
+
+var app = express();
+var server = http.createServer(app);
+var io = io.listen(server);
 
 // ==section== app configurations
 app.configure('development', function(){
@@ -7,9 +13,10 @@ app.configure('development', function(){
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     app.use(express.bodyParser());
 });
-app.listen(3000);
+server.listen(3000);
 
 // ==section== vars
+var sockets = {};
 var rooms = [
     {
       id: 'roomOne',
@@ -45,13 +52,9 @@ function findRoom(id){
   return false;
 }
 
-// ==section== routing
+// ==section== socket.io
 
-// lets create some vars for the data
-// break out routes into a route file ?
-app.get('/', function(req, res){
-  res.send('hi');
-});
+// ==section== routing
 
 // list rooms that exist
 // returns an array of room_ids formatted like this:
@@ -68,6 +71,12 @@ app.get('/room/list', function(req, res){
   res.json(list);
 });
 
+io.sockets.on('connection', function (socket) {
+  socket.on('message', function (data) {
+    socket.join(data.room_id);
+  });
+});
+
 // todo add check for no room id
 // add a comment to a room
 app.post('/comment/add', function(req, res){
@@ -80,14 +89,16 @@ app.post('/comment/add', function(req, res){
   if (!room){
     res.send(404);
   }
+
   var room_index = roomIndex(room_id);
   req.body.ts = parseInt(req.body.ts);
   rooms[room_index].comments.push(req.body);
+
+  socket.broadcast.to(room_id).emit(req.body);
   res.send({200: 'ok'});
 });
 
 app.post('/comment/list', function(req, res){
-  var ts = parseInt(req.body.ts);
   var room_id = req.body.room_id;
 
   if (!room_id) { 
@@ -98,18 +109,6 @@ app.post('/comment/list', function(req, res){
   if (!room){
     res.send(404);
   }
-
-  var current;
-  var comments = room.comments;
-  if (ts){
-    for (var i=0; i<comments.length; i+=1){
-      if (comments[i].ts >= ts){
-        console.log('done on',i)
-        break;
-      }
-    }
-    comments = comments.slice(i);
-  }
-    
-  res.send(comments);
+   
+  res.send(room);
 });
