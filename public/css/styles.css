@@ -1,0 +1,88 @@
+.login-container {
+    position: relative;
+}
+
+.login-button {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+form.login {
+    padding-right: 50px;
+    float: right;
+}
+form.login .close {
+	cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+form.login .alert-error{
+    margin-top: 8px;
+}
+
+.app-container {
+    width: 100%;
+    margin-top: 32px;
+}
+.stream {
+	width: 300;
+    margin-left: 502px;
+    border-left-color: rgba(0, 0, 0, 0.046875);
+    border-left: 2px;
+}
+.feed {
+    display: block;
+    float: left;
+	width: 500px;
+    position: relative;
+}
+.main-container {
+	position: relative;
+    width: 900px;
+	margin: 0px auto;
+    padding: 12px;
+	background: rgba(204,204,204,.2);
+    min-height: 600px;
+    overflow: hidden;
+}
+.comments {
+    display: inline-block;
+}
+.comments .comment {
+	overflow: hidden;
+	padding: 5px 0;
+	color: black;
+    list-style-type: none;
+}
+.comments .comment img {
+	width: 50px;
+	height: 50px;
+	float: left;
+	margin: 0 5px 5px 0;
+}
+.comments .comment {
+    border-bottom: 1px dotted #c3c3c3;
+}
+.app-list ul li {
+    list-style-type: none;
+}
+ul.droppable {
+    min-height: 30px;
+}
+
+.draggable {
+    cursor: move;
+}
+.feed ul {
+    overflow: scroll;
+}
+.feed ul li.placeholder {
+    padding: 12px;
+    border: 2px dotted #a2a2a2;
+}
+.feed ul li.comment {
+    position: relative;
+    display: inline;
+}

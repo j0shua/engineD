@@ -10,7 +10,7 @@ $(function() {
 		roomName = $('h1 span'),
 		loginForm = $('form.login'),
 		loginButton = $('.login-button'),
-		loginError = loginForm.find('span.error');
+		loginError = loginForm.find('div.alert');
 	
 	var currentRoom;
 	var user = {
@@ -39,7 +39,7 @@ $(function() {
 			url: 'room/list'
 		}).done(function( msg ) {
 			msg.forEach(function(room){
-				roomList.append('<li><a href="" data-id="'+room.id+'">'+room.id+'</a></li>')
+				roomList.append('<li><a href="" data-id="'+room.id+'"><i class="icon-align-justify"></i> '+room.id+'</a></li>')
 			})
 		});
 	}
@@ -55,8 +55,11 @@ $(function() {
 	})
 	loginForm.on('click','.close',function(){
 		loginForm.hide();
+		loginError.hide();
+	    loginButton.show();
 	})
 	loginButton.click(function(){
+	    loginButton.hide();
 		loginForm.show();	
 	})
 	name.click(function() {
@@ -106,6 +109,7 @@ $(function() {
 		$.ajax(obj).done(function(room) {
 			console.log(room);
 			room.comments.forEach(renderMsg)
+            $('.draggable').draggable();
 		});
 		socket.emit('join', {room_id: currentRoom});
 	}
@@ -113,7 +117,7 @@ $(function() {
 	//renders a message
 	function renderMsg(item) {
 		if (!item) {return;}
-		stream.prepend('<li class="comment"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
+		stream.prepend('<li class="comment draggable"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
 	}
 
 	function renderAdmin() {
@@ -129,10 +133,19 @@ $(function() {
 		renderAdmin();
 	})
 	socket.on('authfail',function(data){
-		loginError.html('Error, please try again.')
+		loginError.html('Error, please try again.').show()
 	})
 
 	//get the list of rooms on page load
 	getRooms();
+    $('.sortable').sortable();
+    $('.droppable').droppable({
+        drop: function( event, ui ) {
+            $(this).find("li.placeholder" ).remove();
+            var dragged = ui.draggable.remove();
+            $(this).append(dragged.css({position: 'relative', top: 0, left: 0}));
+        }
+    });
+    
 
 })
