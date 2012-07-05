@@ -7,7 +7,6 @@ var io = require('socket.io');
 var roomManager = require('./app/room-manager.js');
 var socketHandler = require('./app/socket-handler.js');
 var httpHandler = require('./app/http-handler.js');
-console.log(roomManager,socketHandler,httpHandler);
 
 //create express server
 var app = express();
