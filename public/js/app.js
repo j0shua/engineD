@@ -20,7 +20,7 @@ $(function() {
 
 	//returns to the room list, clears the stream
 	function backToList() {
-		socket.emit('leave',{room: room_id})
+		socket.emit('leave',{room: room_id});
 		currentRoom = null;
 		stream.html('');
 		roomList.html('');
@@ -39,8 +39,8 @@ $(function() {
 			url: 'room/list'
 		}).done(function( msg ) {
 			msg.forEach(function(room){
-				roomList.append('<li><a href="" data-id="'+room.id+'"><i class="icon-align-justify"></i> '+room.id+'</a></li>')
-			})
+				roomList.append('<li><a href="" data-id="'+room.id+'"><i class="icon-align-justify"></i> '+room.id+'</a></li>');
+			});
 		});
 	}
 
@@ -48,25 +48,25 @@ $(function() {
 	roomList.on('click', 'a',function() {
 		initRoom($(this).attr('data-id'));
 		return false;
-	})
+	});
 	roomUI.on('click','.backToList',function() {
 		backToList();
 		return false;
-	})
+	});
 	loginForm.on('click','.close',function(){
 		loginForm.hide();
 		loginError.hide();
-	    loginButton.show();
-	})
+		loginButton.show();
+	});
 	loginButton.click(function(){
-	    loginButton.hide();
-		loginForm.show();	
-	})
+		loginButton.hide();
+		loginForm.show();
+	});
 	name.click(function() {
 		if (name.val().toLowerCase() === 'name') {
 			name.val('');
 		}
-	})
+	});
 
 
 	//form submit handler
@@ -76,9 +76,9 @@ $(function() {
 			name: name.val(),
 			room_id: currentRoom,
 			img: 'https://si0.twimg.com/profile_images/2326165247/wulxf1wh0at7xo30km0a_reasonably_small.jpeg'
-		}
+		};
 		renderMsg(data);
-		socket.emit('add', data)
+		socket.emit('add', data);
 
 		message.val('');
 		name.val('');
@@ -89,9 +89,9 @@ $(function() {
 		loginError.html('');
 		user.username = loginForm.find('.username').val();
 		user.password = loginForm.find('.password').val();
-		socket.emit('auth',user)
+		socket.emit('auth',user);
 		return false;
-	})
+	});
 
 	//kicks off polling for a specific room, handles the state for the room
 	function initRoom(room) {
@@ -103,12 +103,12 @@ $(function() {
 			type: "POST",
 			url: 'comment/list',
 			data: {
-				room_id: room,
+				room_id: room
 			}
 		};
 		$.ajax(obj).done(function(room) {
 			console.log(room);
-			room.comments.forEach(renderMsg)
+			room.comments.forEach(renderMsg);
             $('.draggable').draggable();
 		});
 		socket.emit('join', {room_id: currentRoom});
@@ -127,14 +127,14 @@ $(function() {
 	}
 
 	socket.on('comment',function(data) {
-		renderMsg(data)
-	})
+		renderMsg(data);
+	});
 	socket.on('authsuccess',function(data){
 		renderAdmin();
-	})
+	});
 	socket.on('authfail',function(data){
-		loginError.html('Error, please try again.').show()
-	})
+		loginError.html('Error, please try again.').show();
+	});
 
 	//get the list of rooms on page load
 	getRooms();
@@ -147,5 +147,5 @@ $(function() {
         }
     });
     
-
-})
+    
+});
