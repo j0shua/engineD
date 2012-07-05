@@ -41,7 +41,7 @@ form.login .alert-error{
 .main-container {
 	position: relative;
     width: 900px;
-	margin: 0px auto;
+	margin: 0 auto;
     padding: 12px;
 	background: rgba(204,204,204,.2);
     min-height: 600px;
@@ -55,6 +55,7 @@ form.login .alert-error{
 	padding: 5px 0;
 	color: black;
     list-style-type: none;
+    border-bottom: 1px dotted #c3c3c3;
 }
 .comments .comment img {
 	width: 50px;
@@ -62,8 +63,12 @@ form.login .alert-error{
 	float: left;
 	margin: 0 5px 5px 0;
 }
-.comments .comment {
-    border-bottom: 1px dotted #c3c3c3;
+.comments .comment h3,
+.comments .comment p {
+    float: left;
+}
+.comments .comment h3 {
+    width: 315px;
 }
 .app-list ul li {
     list-style-type: none;
