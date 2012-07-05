@@ -7,7 +7,7 @@
   }
 
 */
-
+var persist = require('./persist.js');
 
 // error checking for adding a comment and uses roomManager to find the room
 // and add the comment.  Broadcasts the new message over the socket room
@@ -18,6 +18,7 @@ function addComment(data,socket,roomManager){
   if (room) {
     room.addComment(data);
     socket.broadcast.to(data.room_id).emit('comment', data);
+    persist.save(roomManager.getAll());
   }
 }
 

@@ -7,6 +7,7 @@ var io = require('socket.io');
 var roomManager = require('./app/room-manager.js');
 var socketHandler = require('./app/socket-handler.js');
 var httpHandler = require('./app/http-handler.js');
+var persist = require('./app/persist.js');
 
 //create express server
 var app = express();
@@ -32,17 +33,7 @@ io.sockets.on('connection', function (socket) {
   socketHandler.bindRoutes(socket,roomManager);
 });
 
-// room setup DEV
-roomManager.addRooms([{
-      id: 'roomOne',
-      comments: []
-    },
-    {
-      id: 'roomTwo',
-      comments: []
-    },
-    {
-      id: 'roomThree',
-      comments: []
-    }
-]);
+// setup existing rooms from storage
+persist.retrieve(function(data) {
+  roomManager.addRooms(data);
+})

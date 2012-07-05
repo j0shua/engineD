@@ -33,7 +33,7 @@ function addRooms(toAdd) {
 		toAdd.forEach(function(room){
 			rooms.push(new Room(room));
 		});
-	} else if (room instanceof Object){
+	} else if (toAdd instanceof Object){
 		rooms.push(new Room(toAdd));
 	} else {
 		return false;
@@ -54,10 +54,15 @@ function roomList() {
   return list;
 }
 
+function getAll() {
+	return rooms;
+}
+
 //expose methods
 module.exports = {
 	findRoom: findRoom,
 	addRooms: addRooms,
 	addRoom: addRooms,
-	roomList: roomList
+	roomList: roomList,
+	getAll: getAll
 };
