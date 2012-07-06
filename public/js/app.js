@@ -8,9 +8,14 @@ $(function() {
 		roomUI = $('.app-container'),
 		roomList = listUI.find('ul'),
 		roomName = $('h1 span'),
+		loginContainer = $('.login-container'),
 		loginForm = $('form.login'),
 		loginButton = $('.login-button'),
-		loginError = loginForm.find('div.alert');
+		loginError = loginForm.find('div.alert'),
+		adminButton = $('.admin-button'),
+		adminUI = $('.app-admin');
+		adminRooms = $('.app-admin.rooms'),
+		adminRoomsList = adminRooms.find('.nav');
 	
 	var currentRoom;
 	var user = {
@@ -18,58 +23,58 @@ $(function() {
 		password: null
 	};
 
-	//returns to the room list, clears the stream
-	function backToList() {
-		socket.emit('leave',{room: room_id});
-		currentRoom = null;
+	//used when switching screens, clears/hides pretty much everything
+	function hideAll() {
 		stream.html('');
 		roomList.html('');
-
-		getRooms();
+		roomName.html('');
+		adminRoomsList.html('');
 
 		roomUI.hide();
+		listUI.hide();
+		adminUI.hide();
+	}
+
+	//returns to the room list, clears the stream
+	function showList() {
+		socket.emit('leave',{room: currentRoom});
+		currentRoom = null;
+		hideAll();
+		getRooms();
 		listUI.show();
 	}
 
 
 	//gets a list of rooms and renders them to the listUI
-	function getRooms() {
+	function getRooms(roomEl, prefix) {
+		prefix = prefix || '#room/';
+		roomEl = roomEl || roomList;
 		$.ajax({
 			type: "GET",
 			url: 'room/list'
 		}).done(function( msg ) {
 			msg.forEach(function(room){
-				roomList.append('<li><a href="" data-id="'+room.id+'"><i class="icon-align-justify"></i> '+room.id+'</a></li>');
+				roomEl.append('<li><a href="'+prefix+room.id+'" data-id="'+room.id+'"><i class="icon-align-justify"></i> '+room.id+'</a></li>');
 			});
 		});
 	}
 
-	//click event to trigger opening a room
-	roomList.on('click', 'a',function() {
-		initRoom($(this).attr('data-id'));
-		return false;
-	});
-	roomUI.on('click','.backToList',function() {
-		backToList();
-		return false;
-	});
-	loginForm.on('click','.close',function(){
-		loginForm.hide();
-		loginError.hide();
-		loginButton.show();
-	});
+	//login form open
 	loginButton.click(function(){
-		loginButton.hide();
-		loginForm.show();
+		loginContainer.modal();
 	});
-	name.click(function() {
-		if (name.val().toLowerCase() === 'name') {
-			name.val('');
-		}
+	//login form submit
+	loginForm.submit(function(){
+		loginError.html('');
+		loginForm.removeClass('error');
+		user.username = loginForm.find('.username').val();
+		user.password = loginForm.find('.password').val();
+		socket.emit('auth',user);
+		return false;
 	});
 
 
-	//form submit handler
+	//comment form submit handler
 	form.submit(function() {
 		var data = {
 			message: message.val(),
@@ -77,27 +82,21 @@ $(function() {
 			room_id: currentRoom,
 			img: 'https://si0.twimg.com/profile_images/2326165247/wulxf1wh0at7xo30km0a_reasonably_small.jpeg'
 		};
+		//render instantly for the user
 		renderMsg(data);
 		socket.emit('add', data);
-
 		message.val('');
-		name.val('');
 		return false;
 	});
 
-	loginForm.submit(function(){
-		loginError.html('');
-		user.username = loginForm.find('.username').val();
-		user.password = loginForm.find('.password').val();
-		socket.emit('auth',user);
-		return false;
-	});
 
-	//kicks off polling for a specific room, handles the state for the room
+	//changes UI to join a room
+	//makes the ajax request for the room
+	//emits the socket join event
 	function initRoom(room) {
+		hideAll();
 		currentRoom = room;
 		roomName.html(room);
-		listUI.hide();
 		roomUI.show();
 		var obj = {
 			type: "POST",
@@ -107,25 +106,38 @@ $(function() {
 			}
 		};
 		$.ajax(obj).done(function(room) {
-			console.log(room);
 			room.comments.forEach(renderMsg);
+			socket.emit('join', {room_id: currentRoom});
             $('.draggable').draggable();
+		}).error(function() {
+			showList();
+			$('.app-list .alert').html('Invalid Room Name').fadeIn().fadeOut(6000);
 		});
-		socket.emit('join', {room_id: currentRoom});
 	}
 
-	//renders a message
+	//renders a message to a room
 	function renderMsg(item) {
 		if (!item) {return;}
-		stream.prepend('<li class="comment draggable"><img src="'+item.img+'"><h3>'+item.name+'</h3><p>'+item.message+'</p></li>');
+		stream.prepend('<li class="comment draggable"><img src="'+item.img+'"><p><strong>'+item.name+'</strong>'+item.message+'</p></li>');
 	}
 
+	//shows the administrator tools
 	function renderAdmin() {
-		alert('You are now an admin');
-		loginForm.hide();
+		loginContainer.modal('hide');
 		loginButton.remove();
+		adminButton.show();
 	}
 
+	//renders the admin
+	function showAdmin(tool) {
+		hideAll();
+		if (tool == 'rooms') {
+			adminRooms.show();
+			getRooms(adminRoomsList,'#admin/room/');
+		}
+	}
+
+	//bind socket events
 	socket.on('comment',function(data) {
 		renderMsg(data);
 	});
@@ -134,11 +146,33 @@ $(function() {
 	});
 	socket.on('authfail',function(data){
 		loginError.html('Error, please try again.').show();
+		loginForm.addClass('error');
 	});
 
-	//get the list of rooms on page load
-	getRooms();
-    $('.sortable').sortable();
+
+	//we use hashchange to trigger events so that back buttons work
+	$(window).hashchange( function(){
+		var location = window.location.hash;
+
+		if (location.indexOf('#room/') != -1) {
+			var room = location.replace('#room/','');
+			initRoom(room);
+			return;
+		}
+		if (location.indexOf('#admin/') != -1) {
+			var tool = location.replace('#admin/','');
+			showAdmin(tool);
+			return;
+		}
+		//default to the list
+		showList();
+	});
+
+	// Trigger the event on page load
+	$(window).hashchange();
+
+
+	$('.sortable').sortable();
     $('.droppable').droppable({
         drop: function( event, ui ) {
             $(this).find("li.placeholder" ).remove();
@@ -146,6 +180,5 @@ $(function() {
             $(this).append(dragged.css({position: 'relative', top: 0, left: 0}));
         }
     });
-    
-    
+
 });

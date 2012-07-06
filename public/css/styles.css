@@ -1,23 +1,11 @@
-.login-container {
-    position: relative;
+.login-button,
+.admin-button.btn-group {
+        position: absolute;
+        top: 10px;
+        right: 25px;
 }
 
-.login-button {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-}
 
-form.login {
-    padding-right: 50px;
-    float: right;
-}
-form.login .close {
-	cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
 form.login .alert-error{
     margin-top: 8px;
 }
@@ -38,12 +26,15 @@ form.login .alert-error{
 	width: 500px;
     position: relative;
 }
+.feed ul {
+    margin: 0 0 9px 0;
+}
 .main-container {
 	position: relative;
     width: 900px;
 	margin: 0 auto;
     padding: 12px;
-	background: rgba(204,204,204,.2);
+	/*background: rgba(204,204,204,.2);*/
     min-height: 600px;
     overflow: hidden;
 }
@@ -63,12 +54,8 @@ form.login .alert-error{
 	float: left;
 	margin: 0 5px 5px 0;
 }
-.comments .comment h3,
-.comments .comment p {
-    float: left;
-}
-.comments .comment h3 {
-    width: 315px;
+.comments .comment strong {
+    display: block;
 }
 .app-list ul li {
     list-style-type: none;

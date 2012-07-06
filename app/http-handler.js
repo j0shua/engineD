@@ -18,6 +18,7 @@ function bindRoutes(app,roomManager) {
 		var room = roomManager.findRoom(req.body.room_id);
 		if (!room){
 			res.send(404);
+			return;
 		}
 		res.send(room);
 	});
