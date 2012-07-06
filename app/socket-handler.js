@@ -53,6 +53,7 @@ function bindRoutes(socket,roomManager) {
     if (authenticate(data)) {
       socket.set('auth', true, function () {
         socket.emit('authsuccess');
+        socket.join('admin');
       });
     } else {
       socket.emit('authfail');
@@ -76,6 +77,7 @@ function bindRoutes(socket,roomManager) {
       socket: socket,
       success: function() {
         roomManager.addRoom(data);
+        socket.broadcast.to('admin').emit('roomCreateSuccess',roomManager.findRoom(data.id));
         socket.emit('roomCreateSuccess',roomManager.findRoom(data.id));
       },
       fail: function() {

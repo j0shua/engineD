@@ -22,6 +22,7 @@ $(function() {
 		adminRoomInfoSave = adminUI.find('.save-info');
 	
 	var currentRoom;
+	var awaitingCreate = false;
 	var user = {
 		username: null,
 		password: null
@@ -89,6 +90,7 @@ $(function() {
 	});
 
 	adminRoomInfoSave.click(function(){
+		awaitingCreate = true;
 		socket.emit('createRoom',{
 			name: adminRoomInfo.find('.name input').val(),
 			id: adminRoomInfo.find('.id').html()
@@ -198,10 +200,11 @@ $(function() {
 		adminRoomInfo.show();
 	});
 	socket.on('roomCreateSuccess',function(data){
-
-		console.log('roomCreateSuccess',data);
 		adminRoomsList.append('<li><a href="#admin/room/'+data.id+'" data-id="'+data.id+'"><i class="icon-align-justify"></i> '+data.name+'</a></li>');
-		socket.emit('roomInfo', {room_id: data.id});
+		if (awaitingCreate) {
+			socket.emit('roomInfo', {room_id: data.id});
+			awaitingCreate = false;
+		}
 	});
 
 
