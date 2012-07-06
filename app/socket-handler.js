@@ -58,6 +58,31 @@ function bindRoutes(socket,roomManager) {
       socket.emit('authfail');
     }
   });
+
+  socket.on('roomInfo',function(data){
+    isAuthenticated({
+      socket: socket,
+      success: function() {
+        socket.emit('roomInfo',roomManager.findRoom(data.room_id));
+      },
+      fail: function() {
+        socket.emit('authfail');
+      }
+    });
+  });
+
+  socket.on('createRoom',function(data){
+    isAuthenticated({
+      socket: socket,
+      success: function() {
+        roomManager.addRoom(data);
+        socket.emit('roomCreateSuccess',roomManager.findRoom(data.id));
+      },
+      fail: function() {
+        socket.emit('authfail');
+      }
+    });
+  });
 }
 
 //expose methods

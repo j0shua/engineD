@@ -1,6 +1,6 @@
 var Room = function(obj) {
 	this.id = obj.id;
-	this.name = obj.name;
+	this.name = obj.name || obj.id;
 	this.comments = obj.comments || [];
 };
 Room.prototype.addComment = function(obj) {

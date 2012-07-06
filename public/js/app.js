@@ -15,7 +15,11 @@ $(function() {
 		adminButton = $('.admin-button'),
 		adminUI = $('.app-admin');
 		adminRooms = $('.app-admin.rooms'),
-		adminRoomsList = adminRooms.find('.nav');
+		adminRoomsList = adminRooms.find('.nav.list'),
+		adminRoomInfo = adminUI.find('.info'),
+		adminError = adminUI.find('div.alert'),
+		adminAddRoom = adminUI.find('.add-room'),
+		adminRoomInfoSave = adminUI.find('.save-info');
 	
 	var currentRoom;
 	var user = {
@@ -28,7 +32,6 @@ $(function() {
 		stream.html('');
 		roomList.html('');
 		roomName.html('');
-		adminRoomsList.html('');
 
 		roomUI.hide();
 		listUI.hide();
@@ -65,12 +68,31 @@ $(function() {
 	});
 	//login form submit
 	loginForm.submit(function(){
-		loginError.html('');
+		loginError.html('').hide();
+		adminError.html('').hide();
 		loginForm.removeClass('error');
 		user.username = loginForm.find('.username').val();
 		user.password = loginForm.find('.password').val();
 		socket.emit('auth',user);
 		return false;
+	});
+
+	adminAddRoom.click(function(){
+		adminRoomInfo.find('.name').html('<input class="name input-xlarge" type="text" placeholder="name"/>');
+		adminRoomInfo.find('.id').html('');
+		adminRoomInfoSave.show();
+		return false;
+	});
+
+	adminRoomInfo.on('keyup','.name input',function() {
+		adminRoomInfo.find('.id').html($(this).val().replace(/\s/g,''));
+	});
+
+	adminRoomInfoSave.click(function(){
+		socket.emit('createRoom',{
+			name: adminRoomInfo.find('.name input').val(),
+			id: adminRoomInfo.find('.id').html()
+		});
 	});
 
 
@@ -129,12 +151,28 @@ $(function() {
 		adminButton.show();
 	}
 
+	function getAdminRoomList() {
+		adminRoomsList.html('');
+		adminRoomsList.append('<li class="nav-header">Rooms</li>');
+		adminRooms.show();
+
+		getRooms(adminRoomsList,'#admin/room/');
+	}
 	//renders the admin
 	function showAdmin(tool) {
 		hideAll();
+		adminRoomInfoSave.hide();
+		roomName.html('Admin');
 		if (tool == 'rooms') {
+			adminRoomInfo.find('.name').html('');
+			adminRoomInfo.find('.id').html('');
+			getAdminRoomList();
+			return;
+		}
+		if (tool.indexOf('room/') != -1) {
 			adminRooms.show();
-			getRooms(adminRoomsList,'#admin/room/');
+			var room = tool.replace('room/','');
+			socket.emit('roomInfo', {room_id: room});
 		}
 	}
 
@@ -144,10 +182,26 @@ $(function() {
 	});
 	socket.on('authsuccess',function(data){
 		renderAdmin();
+		window.location = '#admin/rooms';
 	});
 	socket.on('authfail',function(data){
 		loginError.html('Error, please try again.').show();
+		adminError.html('You are not authorized').show();
 		loginForm.addClass('error');
+	});
+	socket.on('roomInfo',function(data){
+		adminRooms.show();
+		adminRoomsList.find('a').parent().removeClass('active');
+		adminRoomInfo.find('.name').html(data.name);
+		adminRoomInfo.find('.id').html(data.id);
+		adminRoomsList.find('a[data-id="'+data.id+'"]').parent().addClass('active');
+		adminRoomInfo.show();
+	});
+	socket.on('roomCreateSuccess',function(data){
+
+		console.log('roomCreateSuccess',data);
+		adminRoomsList.append('<li><a href="#admin/room/'+data.id+'" data-id="'+data.id+'"><i class="icon-align-justify"></i> '+data.name+'</a></li>');
+		socket.emit('roomInfo', {room_id: data.id});
 	});
 
 
