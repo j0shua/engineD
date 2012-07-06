@@ -5,7 +5,7 @@ $(function() {
 		name = form.find('input.username'),
 		stream = $('.stream ul'),
 		listUI = $('.app-list'),
-		roomUI = $('.app-container'),
+		roomUI = $('.app-room'),
 		roomList = listUI.find('ul'),
 		roomName = $('h1 span'),
 		loginContainer = $('.login-container'),

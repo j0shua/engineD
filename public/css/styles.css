@@ -4,21 +4,15 @@
         top: 10px;
         right: 25px;
 }
-
-
 form.login .alert-error{
     margin-top: 8px;
 }
-
 .app-container {
-    width: 100%;
     margin-top: 32px;
 }
-.stream {
-	width: 300;
-    margin-left: 502px;
-    border-left-color: rgba(0, 0, 0, 0.046875);
-    border-left: 2px;
+.stream form input,
+.stream form textarea {
+    width: 100%;
 }
 .feed {
     display: block;
@@ -29,17 +23,10 @@ form.login .alert-error{
 .feed ul {
     margin: 0 0 9px 0;
 }
-.main-container {
-	position: relative;
-    width: 900px;
-	margin: 0 auto;
-    padding: 12px;
-	/*background: rgba(204,204,204,.2);*/
-    min-height: 600px;
-    overflow: hidden;
-}
 .comments {
     display: inline-block;
+    width: 100%;
+    margin: 0;
 }
 .comments .comment {
 	overflow: hidden;
@@ -67,12 +54,10 @@ ul.droppable {
 .draggable {
     cursor: move;
 }
-.feed ul {
-    overflow: scroll;
-}
 .feed ul li.placeholder {
     padding: 12px;
     border: 2px dotted #a2a2a2;
+    list-style: none;
 }
 .feed ul li.comment {
     position: relative;
