@@ -76,6 +76,7 @@ $(function() {
 
 	//comment form submit handler
 	form.submit(function() {
+		if (!message.val()) {return false;}
 		var data = {
 			message: message.val(),
 			name: name.val(),

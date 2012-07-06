@@ -4,6 +4,7 @@ var Room = function(obj) {
 	this.comments = obj.comments || [];
 };
 Room.prototype.addComment = function(obj) {
+	if (!obj.message) {return;}
 	this.comments.push(obj);
 };
 
