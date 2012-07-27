@@ -25,7 +25,8 @@ $(function() {
 	var awaitingCreate = false;
 	var user = {
 		username: null,
-		password: null
+		password: null,
+		isAdmin: false
 	};
 
 	//used when switching screens, clears/hides pretty much everything
@@ -58,9 +59,14 @@ $(function() {
 			url: 'room/list'
 		}).done(function( msg ) {
 			msg.forEach(function(room){
-				roomEl.append('<li><a href="'+prefix+room.id+'" data-id="'+room.id+'"><i class="icon-align-justify"></i> '+room.id+'</a></li>');
+				roomEl.append('<li><a href="'+prefix+room.id+'" data-id="'+room.id+'"><i class="icon-align-justify"></i> '+room.name+'</a></li>');
 			});
 		});
+	}
+
+	function setUser(userObj) {
+		user = userObj;
+		$.jStorage.set('user',user);
 	}
 
 	//login form open
@@ -72,8 +78,11 @@ $(function() {
 		loginError.html('').hide();
 		adminError.html('').hide();
 		loginForm.removeClass('error');
-		user.username = loginForm.find('.username').val();
-		user.password = loginForm.find('.password').val();
+		setUser({
+			username: loginForm.find('.username').val(),
+			password: loginForm.find('.password').val(),
+			isAdmin: true
+		});
 		socket.emit('auth',user);
 		return false;
 	});
@@ -81,12 +90,14 @@ $(function() {
 	adminAddRoom.click(function(){
 		adminRoomInfo.find('.name').html('<input class="name input-xlarge" type="text" placeholder="name"/>');
 		adminRoomInfo.find('.id').html('');
+		adminRoomInfo.find('.link').html('');
 		adminRoomInfoSave.show();
 		return false;
 	});
 
 	adminRoomInfo.on('keyup','.name input',function() {
-		adminRoomInfo.find('.id').html($(this).val().replace(/\s/g,''));
+		adminRoomInfo.find('.id').html($(this).val().replace(/\s/g,'-').toLowerCase());
+		adminRoomInfo.find('.link').html('/#'+$(this).val().replace(/\s/g,'-').toLowerCase());
 	});
 
 	adminRoomInfoSave.click(function(){
@@ -121,7 +132,6 @@ $(function() {
 	function initRoom(room) {
 		hideAll();
 		currentRoom = room;
-		roomName.html(room);
 		roomUI.show();
 		var obj = {
 			type: "POST",
@@ -131,9 +141,9 @@ $(function() {
 			}
 		};
 		$.ajax(obj).done(function(room) {
+			roomName.html(room.name);
 			room.comments.forEach(renderMsg);
 			socket.emit('join', {room_id: currentRoom});
-            $('.draggable').draggable();
 		}).error(function() {
 			showList();
 			$('.app-list .alert').html('Invalid Room Name').fadeIn().fadeOut(6000);
@@ -143,7 +153,7 @@ $(function() {
 	//renders a message to a room
 	function renderMsg(item) {
 		if (!item) {return;}
-		stream.prepend('<li class="comment draggable"><img src="'+item.img+'"><p><strong>'+item.name+'</strong>'+item.message+'</p></li>');
+		stream.prepend('<li class="comment"><img src="'+item.img+'"><p><strong>'+item.name+'</strong>'+item.message+'</p>'+(user.isAdmin ? '<span class="promote">&larr;</span>' : '')+'</li>');
 	}
 
 	//shows the administrator tools
@@ -168,11 +178,17 @@ $(function() {
 		if (tool == 'rooms') {
 			adminRoomInfo.find('.name').html('');
 			adminRoomInfo.find('.id').html('');
+			adminRoomInfo.find('.link').html('');
 			getAdminRoomList();
 			return;
 		}
+		if (tool === 'logout') {
+			$.jStorage.set('user',undefined);
+			window.location = '';
+		}
 		if (tool.indexOf('room/') != -1) {
 			adminRooms.show();
+			getAdminRoomList();
 			var room = tool.replace('room/','');
 			socket.emit('roomInfo', {room_id: room});
 		}
@@ -184,7 +200,6 @@ $(function() {
 	});
 	socket.on('authsuccess',function(data){
 		renderAdmin();
-		window.location = '#admin/rooms';
 	});
 	socket.on('authfail',function(data){
 		loginError.html('Error, please try again.').show();
@@ -197,6 +212,7 @@ $(function() {
 		adminRoomInfo.find('.name').html(data.name);
 		adminRoomInfo.find('.id').html(data.id);
 		adminRoomsList.find('a[data-id="'+data.id+'"]').parent().addClass('active');
+		adminRoomInfo.find('.link').html('<a href="#room/'+data.id+'">/#'+data.id+'</a>');
 		adminRoomInfo.show();
 	});
 	socket.on('roomCreateSuccess',function(data){
@@ -226,17 +242,12 @@ $(function() {
 		showList();
 	});
 
+	//log the user in from the localstorage
+	user = $.jStorage.get('user',user);
+	if (user.username && user.password) {
+		socket.emit('auth',user);
+	}
+
 	// Trigger the event on page load
 	$(window).hashchange();
-
-
-	$('.sortable').sortable();
-    $('.droppable').droppable({
-        drop: function( event, ui ) {
-            $(this).find("li.placeholder" ).remove();
-            var dragged = ui.draggable.remove();
-            $(this).append(dragged.css({position: 'relative', top: 0, left: 0}));
-        }
-    });
-
 });

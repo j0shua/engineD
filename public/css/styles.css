@@ -22,6 +22,20 @@ form.login .alert-error{
 .stream form textarea {
     width: 100%;
 }
+.stream .comment {
+ position: relative;
+ overflow: hidden;   
+}
+.stream .promote {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    cursor: pointer;
+}
+.stream .promote:hover {
+    text-decoration: underline;
+    font-weight: bold;
+}
 .feed {
     display: block;
     float: left;
@@ -54,13 +68,6 @@ form.login .alert-error{
 }
 .app-list ul li {
     list-style-type: none;
-}
-ul.droppable {
-    min-height: 30px;
-}
-
-.draggable {
-    cursor: move;
 }
 .feed ul li.placeholder {
     padding: 12px;

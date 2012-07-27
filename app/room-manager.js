@@ -43,13 +43,16 @@ function addRooms(toAdd) {
 // list rooms that exist
 // returns an array of room_ids formatted like this:
 // [
-//    {id: room_id},
-//    {id: room_id}
+//    {id: room_id,name: room_name},
+//    {id: room_id,name: room_name}
 // ]
 function roomList() {
   var list = [];
   for (var i=0; i<rooms.length; i+=1){
-    list.push({id: rooms[i].id});
+    list.push({
+		id: rooms[i].id,
+		name: rooms[i].name
+    });
   }
   return list;
 }
